@@ -47,7 +47,7 @@ pub fn main(init: std.process.Init) !void {
     var time_str = try std.fmt.allocPrintSentinel(allocator, "{f}", .{time}, 0);
     defer allocator.free(time_str);
 
-    rl.initWindow(screen_width, screen_height, "Zig Binary Clock");
+    rl.initWindow(screen_width, screen_height, "bclk - Binary Clock");
     defer rl.closeWindow();
     rl.setTargetFPS(60);
 
