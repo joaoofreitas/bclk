@@ -64,6 +64,8 @@ pub fn main(init: std.process.Init) !void {
 
             timestamp = std.Io.Clock.real.now(init.io);
             time = BTime.get(timestamp);
+
+            allocator.free(time_str); // Free the previous time string before allocating a new one
             time_str = try std.fmt.allocPrintSentinel(allocator, "{f}", .{time}, 0);
         }
 
