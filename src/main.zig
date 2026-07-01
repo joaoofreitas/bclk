@@ -57,7 +57,6 @@ pub fn main(init: std.process.Init) !void {
     defer rl.closeWindow();
     rl.setTargetFPS(60);
 
-    // Main game loop
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
