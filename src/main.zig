@@ -30,7 +30,13 @@ const BTime = struct {
 };
 
 pub fn main(init: std.process.Init) !void {
-    const allocator = std.heap.page_allocator;
+    var gpa: std.heap.DebugAllocator(.{}) = .init;
+    const allocator = gpa.allocator();
+    defer {
+        if (gpa.deinit() == .leak) {
+            std.debug.print("Memory leak detected!\n", .{});
+        }
+    }
 
     const screen_width = 800;
     const screen_height = 800;
