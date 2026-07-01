@@ -33,8 +33,8 @@ pub fn main(init: std.process.Init) !void {
     const allocator = std.heap.page_allocator;
     const screen_width = 800;
     const screen_height = 800;
-    const radius: f32 = @floatFromInt(screen_width / 40);
-    const spacing: f32 = (radius * 2) + radius / 2;
+    const cell_size: f32 = @floatFromInt(screen_width / 40);
+    const spacing: f32 = (cell_size * 2) + cell_size / 2;
 
     var update_timer: f32 = 0; // Timer to track when to update the time display
     var timestamp = std.Io.Clock.real.now(init.io);
@@ -86,11 +86,9 @@ pub fn main(init: std.process.Init) !void {
                 const active = ((digit >> bit_index) & 1) == 1;
 
                 const color = if (active) rl.Color.ray_white else rl.Color.dark_gray;
-                rl.drawCircle(@intFromFloat(x), @intFromFloat(y), radius, color);
+                rl.drawRectangle(@intFromFloat(x - cell_size), @intFromFloat(y - cell_size), @intFromFloat(cell_size * 2), @intFromFloat(cell_size * 2), color);
             }
         }
-
-        //TODO:  Make dynamic
-        rl.drawText(time_str, (screen_width / 2) - 45, (screen_height) - 150, 30, rl.Color.white);
+        rl.drawText(time_str, (screen_width / 2) - 45, (0.7 * screen_height), 30, rl.Color.white);
     }
 }
