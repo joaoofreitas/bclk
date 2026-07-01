@@ -31,8 +31,10 @@ const BTime = struct {
 
 pub fn main(init: std.process.Init) !void {
     const allocator = std.heap.page_allocator;
-    const screen_width = 450;
-    const screen_height = 450;
+    const screen_width = 800;
+    const screen_height = 800;
+    const radius: f32 = @floatFromInt(screen_width / 40);
+    const spacing: f32 = (radius * 2) + radius / 2;
 
     var update_timer: f32 = 0; // Timer to track when to update the time display
     var timestamp = std.Io.Clock.real.now(init.io);
@@ -60,7 +62,35 @@ pub fn main(init: std.process.Init) !void {
             time_str = try std.fmt.allocPrintSentinel(allocator, "{f}", .{time}, 0);
         }
 
-        // TODO:  Make dynamic
+        const digits = [_]u8{
+            time.hour / 10, time.hour % 10, // Col 0 & 1
+            time.minute / 10, time.minute % 10, // Col 2 & 3
+            time.second / 10, time.second % 10, // Col 4 & 5
+        };
+
+        const grid_width = 5.0 * spacing;
+        const grid_height = 3.0 * spacing;
+        const start_x: f32 = (@as(f32, @floatFromInt(screen_width)) - grid_width) / 2.0;
+        const start_y: f32 = (@as(f32, @floatFromInt(screen_height)) - grid_height) / 2.0;
+
+        for (digits, 0..) |digit, col| {
+            for (0..4) |row| {
+                if (col == 0 and row < 2) continue; // Hour tens
+                if (col == 2 and row == 0) continue; // Minute tens
+                if (col == 4 and row == 0) continue; // Second tens
+
+                const x = start_x + (@as(f32, @floatFromInt(col)) * spacing);
+                const y = start_y + (@as(f32, @floatFromInt(row)) * spacing);
+
+                const bit_index: u3 = @intCast(3 - row);
+                const active = ((digit >> bit_index) & 1) == 1;
+
+                const color = if (active) rl.Color.ray_white else rl.Color.dark_gray;
+                rl.drawCircle(@intFromFloat(x), @intFromFloat(y), radius, color);
+            }
+        }
+
+        //TODO:  Make dynamic
         rl.drawText(time_str, (screen_width / 2) - 45, (screen_height) - 150, 30, rl.Color.white);
     }
 }
