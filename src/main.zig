@@ -1,9 +1,8 @@
 const bclk = @import("bclk");
-
 const std = @import("std");
 const rl = @import("raylib");
 
-// Import C time functions for timezone handling
+// Import C time functions from C time.h
 const c = @cImport({
     @cInclude("time.h");
 });
@@ -32,27 +31,34 @@ const BTime = struct {
 
 pub fn main(init: std.process.Init) !void {
     const allocator = std.heap.page_allocator;
-
     const screen_width = 450;
     const screen_height = 450;
 
+    var update_timer: f32 = 0; // Timer to track when to update the time display
+    var timestamp = std.Io.Clock.real.now(init.io);
+    var time: BTime = BTime.get(timestamp);
+    var time_str = try std.fmt.allocPrintSentinel(allocator, "{f}", .{time}, 0);
+    defer allocator.free(time_str);
+
     rl.initWindow(screen_width, screen_height, "Zig Binary Clock");
-    defer rl.closeWindow(); // Ensures window closes on exit
+    defer rl.closeWindow();
     rl.setTargetFPS(60);
 
     // Main game loop
     while (!rl.windowShouldClose()) {
-        // TODO: Get current time and convert to binary
-        const timestamp = std.Io.Clock.real.now(init.io);
-        const time: BTime = BTime.get(timestamp);
-
         rl.beginDrawing();
         defer rl.endDrawing();
 
         rl.clearBackground(rl.Color.black);
 
-        const time_str = try std.fmt.allocPrintSentinel(allocator, "{f}", .{time}, 0);
-        defer allocator.free(time_str);
+        update_timer += rl.getFrameTime();
+        if (update_timer >= 1.0) {
+            update_timer = 0;
+
+            timestamp = std.Io.Clock.real.now(init.io);
+            time = BTime.get(timestamp);
+            time_str = try std.fmt.allocPrintSentinel(allocator, "{f}", .{time}, 0);
+        }
 
         // TODO:  Make dynamic
         rl.drawText(time_str, (screen_width / 2) - 45, (screen_height) - 150, 30, rl.Color.white);
