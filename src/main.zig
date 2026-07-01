@@ -8,13 +8,8 @@ const c = @cImport({
     @cInclude("time.h");
 });
 
-
 pub fn main(init: std.process.Init) !void {
-    const io = init.io;
-
-    var gpa = std.heap.DebugAllocator(.{}){};
-    defer _ = gpa.deinit(); 
-    const allocator = gpa.allocator();
+    const allocator = std.heap.page_allocator;
 
     const screen_width = 450;
     const screen_height = 450;
@@ -24,11 +19,10 @@ pub fn main(init: std.process.Init) !void {
 
     rl.setTargetFPS(60);
 
-
     // Main game loop
     while (!rl.windowShouldClose()) {
         // TODO: Get current time and convert to binary
-        const timestamp = std.Io.Clock.real.now(io);
+        const timestamp = std.Io.Clock.real.now(init.io);
         const seconds = timestamp.toSeconds();
 
         const c_time: c.time_t = @intCast(seconds);
