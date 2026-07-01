@@ -28,9 +28,9 @@ pub fn main(init: std.process.Init) !void {
         const c_time: c.time_t = @intCast(seconds);
         const time_info = c.localtime(&c_time);
 
-        const hour = time_info.*.tm_hour;
-        const minute = time_info.*.tm_min;
-        const second = @mod(seconds, 60);
+        const hour = @as(u8, @intCast(time_info.*.tm_hour));
+        const minute = @as(u8, @intCast(time_info.*.tm_min));
+        const second = @as(u8, @intCast(@mod(seconds, 60)));
 
         rl.beginDrawing();
         defer rl.endDrawing();
@@ -38,9 +38,9 @@ pub fn main(init: std.process.Init) !void {
         rl.clearBackground(rl.Color.black);
 
         const time_str = try std.fmt.allocPrintSentinel(allocator, "{d:02}:{d:02}:{d:02}", .{
-            @as(u8, @intCast(hour)),
-            @as(u8, @intCast(minute)),
-            @as(u8, @intCast(second)),
+            hour,
+            minute,
+            second,
         }, 0);
         defer allocator.free(time_str);
 
