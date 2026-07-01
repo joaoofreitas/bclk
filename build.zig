@@ -46,9 +46,9 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-const raylib = raylib_dep.module("raylib"); // main raylib module
-const raygui = raylib_dep.module("raygui"); // raygui module
-const raylib_artifact = raylib_dep.artifact("raylib"); // raylib C library
+    const raylib = raylib_dep.module("raylib"); // main raylib module
+    const raygui = raylib_dep.module("raygui"); // raygui module
+    const raylib_artifact = raylib_dep.artifact("raylib"); // raylib C library
 
     // Here we define an executable. An executable needs to have a root module
     // which needs to expose a `main` function. While we could add a main function
