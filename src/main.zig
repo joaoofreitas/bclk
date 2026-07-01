@@ -20,11 +20,11 @@ const BTime = struct {
         return BTime{
             .hour = @as(u8, @intCast(time_info.*.tm_hour)),
             .minute = @as(u8, @intCast(time_info.*.tm_min)),
-            .second = @as(u8, @intCast(@mod(seconds, 60))),
+            .second = @as(u8, @intCast(time_info.*.tm_sec)),
         };
     }
 
-    pub fn format(self: BTime, writer: *std.Io.Writer) !void {
+    pub fn format(self: BTime, writer: anytype) !void {
         try writer.print("{d:02}:{d:02}:{d:02}", .{ self.hour, self.minute, self.second });
     }
 };
