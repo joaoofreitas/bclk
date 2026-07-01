@@ -40,10 +40,10 @@ pub fn main(init: std.process.Init) !void {
 
     const screen_width = 800;
     const screen_height = 800;
-    const cell_size: f32 = @floatFromInt(screen_width / 40);
+    const cell_size: f32 = @floatFromInt(screen_width / 30);
     const spacing: f32 = (cell_size * 2) + cell_size / 2; // Cell size + spacing between cells
-    const grid_width = 5.0 * spacing;
-    const grid_height = 3.0 * spacing;
+    const grid_width = (6.0 - 1.0) * spacing;
+    const grid_height = (4.0 - 1.0) * spacing;
     const start_x: f32 = (@as(f32, @floatFromInt(screen_width)) - grid_width) / 2.0;
     const start_y: f32 = (@as(f32, @floatFromInt(screen_height)) - grid_height) / 2.0;
 
