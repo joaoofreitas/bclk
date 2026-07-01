@@ -8,6 +8,28 @@ const c = @cImport({
     @cInclude("time.h");
 });
 
+const BTime = struct {
+    hour: u8,
+    minute: u8,
+    second: u8,
+
+    fn get(timestamp: std.Io.Timestamp) BTime {
+        const seconds = timestamp.toSeconds();
+        const c_time: c.time_t = @intCast(seconds);
+        const time_info = c.localtime(&c_time);
+
+        return BTime{
+            .hour = @as(u8, @intCast(time_info.*.tm_hour)),
+            .minute = @as(u8, @intCast(time_info.*.tm_min)),
+            .second = @as(u8, @intCast(@mod(seconds, 60))),
+        };
+    }
+
+    pub fn format(self: BTime, writer: *std.Io.Writer) !void {
+        try writer.print("{d:02}:{d:02}:{d:02}", .{ self.hour, self.minute, self.second });
+    }
+};
+
 pub fn main(init: std.process.Init) !void {
     const allocator = std.heap.page_allocator;
 
@@ -16,34 +38,23 @@ pub fn main(init: std.process.Init) !void {
 
     rl.initWindow(screen_width, screen_height, "Zig Binary Clock");
     defer rl.closeWindow(); // Ensures window closes on exit
-
     rl.setTargetFPS(60);
 
     // Main game loop
     while (!rl.windowShouldClose()) {
         // TODO: Get current time and convert to binary
         const timestamp = std.Io.Clock.real.now(init.io);
-        const seconds = timestamp.toSeconds();
-
-        const c_time: c.time_t = @intCast(seconds);
-        const time_info = c.localtime(&c_time);
-
-        const hour = @as(u8, @intCast(time_info.*.tm_hour));
-        const minute = @as(u8, @intCast(time_info.*.tm_min));
-        const second = @as(u8, @intCast(@mod(seconds, 60)));
+        const time: BTime = BTime.get(timestamp);
 
         rl.beginDrawing();
         defer rl.endDrawing();
 
         rl.clearBackground(rl.Color.black);
 
-        const time_str = try std.fmt.allocPrintSentinel(allocator, "{d:02}:{d:02}:{d:02}", .{
-            hour,
-            minute,
-            second,
-        }, 0);
+        const time_str = try std.fmt.allocPrintSentinel(allocator, "{f}", .{time}, 0);
         defer allocator.free(time_str);
 
+        // TODO:  Make dynamic
         rl.drawText(time_str, (screen_width / 2) - 45, (screen_height) - 150, 30, rl.Color.white);
     }
 }
