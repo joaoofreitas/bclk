@@ -44,6 +44,6 @@ pub fn main(init: std.process.Init) !void {
         }, 0);
         defer allocator.free(time_str);
 
-        rl.drawText(time_str, 10, 10, 20, rl.Color.white);
+        rl.drawText(time_str, (screen_width / 2) - 45, (screen_height) - 150, 30, rl.Color.white);
     }
 }
